@@ -1,81 +1,91 @@
 import React, { useState }from 'react';
+import PropTypes from 'prop-types';
 import { makeStyles } from '@material-ui/core/styles';
-import Avatar from '@material-ui/core/Avatar';
-import { deepOrange } from '@material-ui/core/colors';
-
-import InputAdornment from '@material-ui/core/InputAdornment';
-import TextField from '@material-ui/core/TextField';
-import AccountCircle from '@material-ui/icons/AccountCircle';
 import Button from '@material-ui/core/Button';
+import Avatar from '@material-ui/core/Avatar';
+import List from '@material-ui/core/List';
+import ListItem from '@material-ui/core/ListItem';
+import ListItemAvatar from '@material-ui/core/ListItemAvatar';
+import ListItemText from '@material-ui/core/ListItemText';
+import DialogTitle from '@material-ui/core/DialogTitle';
+import Dialog from '@material-ui/core/Dialog';
+import PersonIcon from '@material-ui/icons/Person';
+import AddIcon from '@material-ui/icons/Add';
+import Typography from '@material-ui/core/Typography';
+import { blue } from '@material-ui/core/colors';
+
+
+const emails = ['username@gmail.com', 'user02@gmail.com'];
+const useStyles = makeStyles({
+  avatar: {
+    backgroundColor: blue[100],
+    color: blue[600],
+  },
+});
+
+function SimpleDialog(props) {
+  const classes = useStyles();
+  const { onClose, selectedValue, open } = props;
+
+  const handleClose = () => {
+    onClose(selectedValue);
+  };
+
+  const handleListItemClick = (value) => {
+    onClose(value);
+  };
+
+  return (
+    <Dialog onClose={handleClose} aria-labelledby="simple-dialog-title" open={open}>
+      <DialogTitle id="simple-dialog-title">Set backup account</DialogTitle>
+      <List>
+        {emails.map((email) => (
+          <ListItem button onClick={() => handleListItemClick(email)} key={email}>
+            <ListItemAvatar>
+              <Avatar className={classes.avatar}>
+                <PersonIcon />
+              </Avatar>
+            </ListItemAvatar>
+            <ListItemText primary={email} />
+          </ListItem>
+        ))}
+
+        <ListItem autoFocus button onClick={() => handleListItemClick('addAccount')}>
+          <ListItemAvatar>
+            <Avatar>
+              <AddIcon />
+            </Avatar>
+          </ListItemAvatar>
+          <ListItemText primary="Add account" />
+        </ListItem>
+      </List>
+    </Dialog>
+  );
+}
 
 function App() {
-  const useStyles = makeStyles((theme) => ({
-    root: {
-      display: 'flex',
-      '& > *': {
-        margin: theme.spacing(1),
-      },
-    },
-    orange: {
-      color: theme.palette.getContrastText(deepOrange[500]),
-      backgroundColor: deepOrange[500],
-    },
-    margin: {
-      margin: theme.spacing(1),
-    },
-    root_button: {
-      '& > *': {
-        margin: theme.spacing(1),
-      },
-    }
-  }));
-  const classes = useStyles();
-  const usuario = []
-  const[valueInput, setValueInput] = useState('')
-  const[array,setArray] = useState(usuario)
-  const onChangeTextField = (e) => {
-    setValueInput(e.target.value)
-  }
-  const onClickButton = () => {
-    const copyArray = [...array]
-    copyArray.push(valueInput)
-    setArray(copyArray)
-    setValueInput('')
-  }
-  const onSubmitForm = (e) => {
-    e.preventDefault()
-    onClickButton()
-  }
+  const [open, setOpen] = React.useState(false);
+  const [selectedValue, setSelectedValue] = React.useState(emails[1]);
 
-    return (
-      <div>
-       <form onSubmit={onSubmitForm}>
-        <div className={classes.root}>
-          {array.map((e)=>(<Avatar alt={e} src={e} className={classes.orange} />))}
-        </div>
-        <TextField
-          className={classes.margin}
-          id="input-with-icon-textfield"
-          label="Nombre"
-          value={valueInput}
-          onChange={onChangeTextField}
-          InputProps={{
-            startAdornment: (
-              <InputAdornment position="start">
-                <AccountCircle />
-              </InputAdornment>
-            ),
-          }}
-        />
-        <div className={classes.root_button}>
-          <Button onClick={onClickButton} variant="contained" color="primary" href="#contained-buttons">
-            Link
-          </Button>
-        </div>
-      </form>
-      </div>
-    );
-  
+  const handleClickOpen = () => {
+    setOpen(true);
+  };
+
+  const handleClose = (value) => {
+    setOpen(false);
+    setSelectedValue(value);
+  };
+
+  return (
+    <div>
+      <Typography variant="subtitle1">Selected: {selectedValue}</Typography>
+      <br />
+      <Button variant="outlined" color="primary" onClick={handleClickOpen}>
+        Open simple dialog
+      </Button>
+      <SimpleDialog selectedValue={selectedValue} open={open} onClose={handleClose} />
+    </div>
+  );
 }
 
 export default App;
